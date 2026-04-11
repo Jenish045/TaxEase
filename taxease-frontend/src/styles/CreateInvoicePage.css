@@ -1,0 +1,626 @@
+/* ==================== CREATE INVOICE PAGE ==================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f5f5;
+}
+
+.create-invoice-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+
+.dashboard-header {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid #1e40af;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #1e40af;
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-icon {
+  font-size: 2rem;
+}
+
+.logo-text {
+  color: #1e40af;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 4px;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-item:hover {
+  color: #1e40af;
+  background: rgba(30, 64, 175, 0.08);
+}
+
+.nav-item.active {
+  color: #1e40af;
+  border-bottom-color: #1e40af;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  white-space: nowrap;
+}
+
+.user-name {
+  color: #333;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.btn-logout {
+  background: #dc2626;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-logout:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* ==================== MAIN CONTENT ==================== */
+
+.create-invoice-content {
+  flex: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem;
+}
+
+/* ==================== PAGE HEADER ==================== */
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* ==================== ERROR ALERT ==================== */
+
+.error-alert {
+  background: #fee;
+  border-left: 4px solid #dc2626;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ==================== FORM ==================== */
+
+.invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ==================== FORM SECTION ==================== */
+
+.form-section {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-section h2 {
+  color: #1f2937;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.section-header h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.btn-add-item {
+  background: #1e40af;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-add-item:hover {
+  background: #1a35a8;
+  transform: translateY(-2px);
+}
+
+/* ==================== FORM ROW ==================== */
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==================== FORM GROUP ==================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  font-family: inherit;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1e40af;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+}
+
+.form-group input:disabled {
+  background: #f3f4f6;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* ==================== ITEMS TABLE ==================== */
+
+.items-table {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.items-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1.2fr 0.8fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.items-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1.2fr 0.8fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  align-items: center;
+}
+
+.items-row:last-child {
+  border-bottom: none;
+}
+
+.col-desc input,
+.col-qty input,
+.col-price input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.col-desc input:focus,
+.col-qty input:focus,
+.col-price input:focus {
+  outline: none;
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.col-amount {
+  text-align: right;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: all 0.2s;
+}
+
+.btn-remove-item:hover {
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 4px;
+}
+
+/* ==================== TOTALS SECTION ==================== */
+
+.totals-section {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.totals-section h2 {
+  display: none;
+}
+
+.totals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.total-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.total-item span:first-child {
+  color: #666;
+  font-weight: 500;
+}
+
+.total-item .amount {
+  font-weight: 600;
+  color: #1f2937;
+  text-align: right;
+}
+
+.total-item.grand-total {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #1e40af 0%, #1a35a8 100%);
+  border: none;
+}
+
+.total-item.grand-total span:first-child {
+  color: white;
+  font-size: 1.1rem;
+}
+
+.total-item.grand-total .amount {
+  color: white;
+  font-size: 1.3rem;
+}
+
+/* ==================== FORM ACTIONS ==================== */
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.btn-cancel {
+  background: white;
+  color: #666;
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.btn-cancel:hover {
+  border-color: #1e40af;
+  color: #1e40af;
+}
+
+.btn-submit {
+  background: #1e40af;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #1a35a8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==================== FOOTER ==================== */
+
+.dashboard-footer {
+  background: #1f2937;
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-wrap: wrap;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .nav-menu {
+    width: 100%;
+    order: 3;
+  }
+
+  .nav-item {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .user-section {
+    gap: 0.5rem;
+  }
+
+  .user-name {
+    font-size: 0.8rem;
+  }
+
+  .btn-logout {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .create-invoice-content {
+    padding: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-section {
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .items-header,
+  .items-row {
+    grid-template-columns: 1fr;
+  }
+
+  .col-desc,
+  .col-qty,
+  .col-price,
+  .col-amount,
+  .col-action {
+    display: contents;
+  }
+
+  .totals-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    flex-direction: column;
+  }
+
+  .create-invoice-content {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .form-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .form-row {
+    gap: 0.75rem;
+  }
+
+  .items-table {
+    font-size: 0.85rem;
+  }
+
+  .items-header,
+  .items-row {
+    padding: 0.75rem;
+  }
+
+  .btn-add-item {
+    width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}

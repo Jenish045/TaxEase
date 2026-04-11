@@ -1,0 +1,401 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.invoice-detail-page {
+  background: #f9fafb;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+.header {
+  background: #ffffff;
+  padding: 16px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.logo-icon {
+  font-size: 24px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  margin-left: 50px;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #2563eb;
+}
+
+.header-user {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.user-email {
+  color: #666;
+  font-size: 13px;
+}
+
+.btn-logout {
+  padding: 6px 14px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #ffffff;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+/* ==================== CONTENT ==================== */
+.content {
+  flex: 1;
+  padding: 60px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.detail-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-download,
+.btn-back {
+  padding: 10px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+  background: white;
+  color: #1f2937;
+}
+
+.btn-download:hover,
+.btn-back:hover {
+  background: #f3f4f6;
+}
+
+/* ==================== DETAIL GRID ==================== */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.detail-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.detail-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #666;
+  font-weight: 500;
+}
+
+.value {
+  color: #1f2937;
+  font-weight: 600;
+  text-align: right;
+}
+
+.detail-item.total {
+  padding-top: 16px;
+  border-top: 2px solid #e5e7eb;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.detail-item.total-amount {
+  padding-top: 12px;
+  font-size: 16px;
+  color: #2563eb;
+}
+
+.amount-card {
+  grid-column: 1;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ==================== TABLE ==================== */
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.items-table thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.items-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.items-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #666;
+}
+
+.items-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* ==================== OCR DATA ==================== */
+.ocr-text {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #1f2937;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ==================== LOADING & ERROR ==================== */
+.loading {
+  text-align: center;
+  padding: 80px 40px;
+  color: #666;
+  font-size: 16px;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 16px;
+  border-radius: 4px;
+  border-left: 4px solid #c33;
+  margin-bottom: 20px;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+  background: #f8fafc;
+  color: #666;
+  text-align: center;
+  padding: 25px 40px;
+  font-size: 13px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .amount-card {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content,
+  .content {
+    padding: 0 20px;
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .header-nav {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-actions {
+    width: 100%;
+  }
+
+  .btn-download,
+  .btn-back {
+    flex: 1;
+  }
+
+  .items-table {
+    font-size: 12px;
+  }
+
+  .items-table th,
+  .items-table td {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 20px 15px;
+  }
+
+  .detail-header h2 {
+    font-size: 20px;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+  }
+
+  .btn-download,
+  .btn-back {
+    width: 100%;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .value {
+    text-align: left;
+  }
+}

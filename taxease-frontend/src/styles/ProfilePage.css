@@ -1,0 +1,140 @@
+.profile-page {
+  background: white;
+}
+
+.header {
+  background: white;
+  padding: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+
+.logo-icon {
+  font-size: 20px;
+}
+
+.logo-text {
+  color: #666;
+}
+
+.header-user {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.user-name {
+  color: #666;
+  font-size: 14px;
+}
+
+.btn-dash {
+  padding: 6px 12px;
+  background: white;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-logout-header {
+  padding: 6px 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hero {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.hero p {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.content {
+  padding: 60px 20px;
+  background: #f9fafb;
+  min-height: 400px;
+}
+
+.profile-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.profile-card h2 {
+  margin: 0 0 30px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-row label {
+  display: block;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.info-row p {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.footer {
+  background: #f5f5f5;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+}

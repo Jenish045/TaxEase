@@ -1,0 +1,676 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.home-page {
+  background: #ffffff;
+  overflow-x: hidden;
+}
+
+/* ==================== HEADER ==================== */
+.header {
+  background: #ffffff;
+  padding: 16px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.logo-icon {
+  font-size: 24px;
+}
+
+.logo-text {
+  color: #1f2937;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-login {
+  padding: 8px 20px;
+  background: transparent;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-login:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.btn-signup-header {
+  padding: 8px 20px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-signup-header:hover {
+  background-color: #1d4ed8;
+}
+
+.user-welcome {
+  color: #666;
+  font-size: 13px;
+}
+
+.btn-dashboard {
+  padding: 6px 14px;
+  background: white;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-dashboard:hover {
+  background: #eff6ff;
+}
+
+.btn-logout {
+  padding: 6px 14px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: #dc2626;
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #ffffff;
+  padding: 100px 40px 120px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-content h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  margin-bottom: 50px;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.get-started-label {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-hero {
+  width: 100%;
+  max-width: 450px;
+  padding: 16px;
+  background-color: #ffffff;
+  color: #2563eb;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-hero:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-2px);
+}
+
+/* ==================== WHY CHOOSE TAXEASE ==================== */
+.why-choose {
+  padding: 80px 40px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.why-choose h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 60px;
+  color: #1f2937;
+}
+
+.features-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.feature-card {
+  background: #ffffff;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  border: 1px solid #f3f4f6;
+}
+
+.feature-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ==================== HOW IT WORKS ==================== */
+.how-it-works {
+  padding: 80px 40px;
+  background: #f9fafb;
+  text-align: center;
+}
+
+.how-it-works h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 80px;
+  color: #1f2937;
+}
+
+.steps-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+.step {
+  text-align: center;
+}
+
+.step-number {
+  width: 60px;
+  height: 60px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.step h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.step p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* ==================== PRICING ==================== */
+.pricing {
+  padding: 80px 40px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.pricing h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 60px;
+  color: #1f2937;
+}
+
+.pricing-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.pricing-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 40px 30px;
+  text-align: left;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.pricing-card.featured {
+  border-color: #2563eb;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  transform: scale(1.05);
+}
+
+.featured-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pricing-card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.price {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 30px;
+}
+
+.features-list {
+  list-style: none;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.features-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.features-list li:last-child {
+  border-bottom: none;
+}
+
+.checkmark {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.cross {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.btn-pricing {
+  width: 100%;
+  padding: 12px;
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: not-allowed;
+  font-size: 14px;
+}
+
+.btn-pricing.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-pricing.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+  background: #2c3e50;
+  color: #bbb;
+  padding: 60px 40px 20px;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.footer-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.footer-section p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section li {
+  margin-bottom: 10px;
+}
+
+.footer-section a {
+  color: #bbb;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.footer-section a:hover {
+  color: #ffffff;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #444;
+  color: #999;
+  font-size: 13px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1200px) {
+  .header-content,
+  .hero-content,
+  .why-choose,
+  .how-it-works,
+  .pricing,
+  .footer-content {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .features-grid,
+  .steps-grid,
+  .pricing-grid {
+    gap: 25px;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1.02);
+  }
+}
+
+@media (max-width: 992px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1);
+  }
+
+  .hero-content h1 {
+    font-size: 36px;
+  }
+
+  .why-choose h2,
+  .how-it-works h2,
+  .pricing h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero {
+    padding: 60px 20px 80px;
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    margin-bottom: 35px;
+  }
+
+  .btn-hero {
+    max-width: 100%;
+  }
+
+  .why-choose {
+    padding: 60px 20px;
+  }
+
+  .why-choose h2 {
+    font-size: 24px;
+    margin-bottom: 40px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .feature-card {
+    padding: 30px 20px;
+  }
+
+  .how-it-works {
+    padding: 60px 20px;
+  }
+
+  .how-it-works h2 {
+    font-size: 24px;
+    margin-bottom: 50px;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .pricing {
+    padding: 60px 20px;
+  }
+
+  .pricing h2 {
+    font-size: 24px;
+    margin-bottom: 40px;
+  }
+
+  .pricing-grid {
+    gap: 20px;
+  }
+
+  .pricing-card {
+    padding: 30px 20px;
+  }
+
+  .price {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .footer {
+    padding: 40px 20px 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .hero {
+    padding: 40px 15px 50px;
+  }
+
+  .hero-content h1 {
+    font-size: 22px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .why-choose,
+  .how-it-works,
+  .pricing {
+    padding: 40px 15px;
+  }
+
+  .why-choose h2,
+  .how-it-works h2,
+  .pricing h2 {
+    font-size: 20px;
+    margin-bottom: 30px;
+  }
+
+  .feature-icon {
+    font-size: 36px;
+  }
+
+  .feature-card h3,
+  .step h3 {
+    font-size: 16px;
+  }
+
+  .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+
+  .features-list li {
+    font-size: 13px;
+    padding: 10px 0;
+  }
+
+  .footer {
+    padding: 30px 15px 15px;
+  }
+
+  .footer-section h4 {
+    font-size: 14px;
+  }
+}

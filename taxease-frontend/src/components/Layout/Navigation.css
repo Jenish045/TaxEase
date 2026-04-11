@@ -1,0 +1,91 @@
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 15px 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.nav-logo {
+  font-size: 24px;
+}
+
+.nav-brand h2 {
+  margin: 0;
+  color: #667eea;
+  font-size: 20px;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+  flex: 1;
+  margin-left: 50px;
+}
+
+.nav-link {
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #667eea;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-email {
+  color: #666;
+  font-size: 14px;
+}
+
+.btn-logout {
+  padding: 8px 20px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-logout:hover {
+  background-color: #ff5252;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+
+  .nav-menu {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-user {
+    width: 100%;
+    justify-content: center;
+  }
+}
