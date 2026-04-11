@@ -1,0 +1,230 @@
+const TaxSummary = require('../models/TaxSummary');
+const Invoice = require('../models/Invoice');
+const TaxCalculator = require('../utils/taxCalculator');
+const CONSTANTS = require('../config/constants');
+const logger = require('../utils/logger');
+
+class TaxService {
+  // Calculate quarterly tax summary
+  static async calculateQuarterlyTax(userId, year, quarter) {
+    try {
+      // Determine quarter dates
+      const quarterMonths = {
+        1: { start: 0, end: 2 },    // Jan-Mar
+        2: { start: 3, end: 5 },    // Apr-Jun
+        3: { start: 6, end: 8 },    // Jul-Sep
+        4: { start: 9, end: 11 }    // Oct-Dec
+      };
+
+      const months = quarterMonths[quarter];
+      const startDate = new Date(year, months.start, 1);
+      const endDate = new Date(year, months.end + 1, 0);
+
+      // Get invoices for quarter
+      const invoices = await Invoice.find({
+        userId,
+        invoiceDate: {
+          $gte: startDate,
+          $lte: endDate
+        },
+        approved: true
+      });
+
+      // Calculate taxes
+      const calculation = TaxCalculator.calculateTaxSummary(invoices);
+
+      return {
+        period: `Q${quarter}-${year}`,
+        quarter,
+        year,
+        startDate,
+        endDate,
+        ...calculation
+      };
+    } catch (error) {
+      logger.error('Calculate quarterly tax error:', error);
+      throw error;
+    }
+  }
+
+  // Calculate financial year tax summary
+  static async calculateFYTax(userId, fy) {
+    try {
+      // FY format: "2023-24" means Apr 2023 to Mar 2024
+      const [startYear, endYear] = fy.split('-').map(y => {
+        if (y.length === 2) {
+          return 2000 + parseInt(y);
+        }
+        return parseInt(y);
+      });
+
+      const startDate = new Date(startYear, 3, 1); // April
+      const endDate = new Date(endYear, 2, 31);    // March
+
+      // Get invoices for FY
+      const invoices = await Invoice.find({
+        userId,
+        invoiceDate: {
+          $gte: startDate,
+          $lte: endDate
+        },
+        approved: true
+      });
+
+      // Calculate taxes
+      const calculation = TaxCalculator.calculateTaxSummary(invoices);
+
+      return {
+        period: `FY-${fy}`,
+        financialYear: fy,
+        startDate,
+        endDate,
+        ...calculation
+      };
+    } catch (error) {
+      logger.error('Calculate FY tax error:', error);
+      throw error;
+    }
+  }
+
+  // Calculate GST liability
+  static async calculateGSTLiability(userId, startDate, endDate) {
+    try {
+      const invoices = await Invoice.find({
+        userId,
+        invoiceDate: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        },
+        approved: true
+      });
+
+      let totalSGST = 0;
+      let totalCGST = 0;
+      let totalIGST = 0;
+      let totalInputGST = 0;
+
+      invoices.forEach(inv => {
+        totalSGST += inv.sgst || 0;
+        totalCGST += inv.cgst || 0;
+        totalIGST += inv.igst || 0;
+        // Input GST would come from purchase invoices
+      });
+
+      const totalOutputGST = totalSGST + totalCGST + totalIGST;
+      const netGST = totalOutputGST - totalInputGST;
+
+      return {
+        period: {
+          startDate,
+          endDate
+        },
+        outputGST: {
+          sgst: parseFloat(totalSGST.toFixed(2)),
+          cgst: parseFloat(totalCGST.toFixed(2)),
+          igst: parseFloat(totalIGST.toFixed(2)),
+          total: parseFloat(totalOutputGST.toFixed(2))
+        },
+        inputGST: parseFloat(totalInputGST.toFixed(2)),
+        netGST: parseFloat(netGST.toFixed(2)),
+        isRefund: netGST < 0,
+        refundAmount: netGST < 0 ? Math.abs(netGST) : 0
+      };
+    } catch (error) {
+      logger.error('Calculate GST liability error:', error);
+      throw error;
+    }
+  }
+
+  // Estimate income tax
+  static async estimateIncomeTax(userId, startDate, endDate) {
+    try {
+      const invoices = await Invoice.find({
+        userId,
+        invoiceDate: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        },
+        approved: true
+      });
+
+      let totalIncome = 0;
+      invoices.forEach(inv => {
+        totalIncome += inv.totalAmount || 0;
+      });
+
+      const estimatedTax = TaxCalculator.calculateIncomeTax(totalIncome);
+
+      return {
+        period: {
+          startDate,
+          endDate
+        },
+        totalIncome: parseFloat(totalIncome.toFixed(2)),
+        estimatedTax: parseFloat(estimatedTax.toFixed(2)),
+        effectiveTaxRate: totalIncome > 0 ? ((estimatedTax / totalIncome) * 100).toFixed(2) : 0,
+        exemptionLimit: 250000,
+        taxableIncome: Math.max(0, totalIncome - 250000)
+      };
+    } catch (error) {
+      logger.error('Estimate income tax error:', error);
+      throw error;
+    }
+  }
+
+  // Get compliance status
+  static async getComplianceStatus(userId) {
+    try {
+      const taxSummaries = await TaxSummary.find({ userId });
+
+      const status = {
+        totalPeriods: taxSummaries.length,
+        compliantPeriods: taxSummaries.filter(ts => ts.complianceStatus === 'compliant').length,
+        pendingPeriods: taxSummaries.filter(ts => ts.complianceStatus === 'pending').length,
+        nonCompliantPeriods: taxSummaries.filter(ts => ts.complianceStatus === 'non_compliant').length,
+        overallStatus: 'compliant',
+        lastUpdated: new Date()
+      };
+
+      // Determine overall status
+      if (status.nonCompliantPeriods > 0) {
+        status.overallStatus = 'non_compliant';
+      } else if (status.pendingPeriods > 0) {
+        status.overallStatus = 'in_progress';
+      }
+
+      return status;
+    } catch (error) {
+      logger.error('Get compliance status error:', error);
+      throw error;
+    }
+  }
+
+  // Generate compliance report
+  static async generateComplianceReport(userId) {
+    try {
+      const taxSummaries = await TaxSummary.find({ userId }).sort({ periodStartDate: -1 });
+
+      const report = {
+        generatedAt: new Date(),
+        userId,
+        totalPeriods: taxSummaries.length,
+        periods: taxSummaries.map(ts => ({
+          period: ts.period,
+          status: ts.complianceStatus,
+          gstFiled: ts.gstSummary.gstFiled,
+          itrFiled: ts.incomeTaxSummary.itrFiling.filed,
+          netGST: ts.gstSummary.netGSTPaid,
+          estimatedTax: ts.incomeTaxSummary.estimatedTax
+        }))
+      };
+
+      return report;
+    } catch (error) {
+      logger.error('Generate compliance report error:', error);
+      throw error;
+    }
+  }
+}
+
+module.exports = TaxService;
