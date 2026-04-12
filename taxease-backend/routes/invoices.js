@@ -1,168 +1,220 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const Invoice = require('../models/invoices');
 
-const invoiceSchema = new mongoose.Schema({
-  // Basic Info
-  invoiceNumber: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-
-  // Dates
-  invoiceDate: {
-    type: Date,
-    default: Date.now
-  },
-  dueDate: {
-    type: Date
-  },
-
-  // Client Info
-  clientName: {
-    type: String,
-    required: true
-  },
-  clientEmail: {
-    type: String,
-    required: true
-  },
-  clientPhone: {
-    type: String
-  },
-  clientAddress: {
-    type: String
-  },
-
-  // Items
-  items: [
-    {
-      description: String,
-      quantity: {
-        type: Number,
-        default: 0
-      },
-      unitPrice: {
-        type: Number,
-        default: 0
-      },
-      amount: {
-        type: Number,
-        default: 0
-      }
-    }
-  ],
-
-  // Tax Rates
-  sgstRate: {
-    type: Number,
-    default: 0
-  },
-  cgstRate: {
-    type: Number,
-    default: 0
-  },
-  igstRate: {
-    type: Number,
-    default: 0
-  },
-
-  // Calculated Amounts
-  subtotal: {
-    type: Number,
-    default: 0
-  },
-  sgstAmount: {
-    type: Number,
-    default: 0
-  },
-  cgstAmount: {
-    type: Number,
-    default: 0
-  },
-  igstAmount: {
-    type: Number,
-    default: 0
-  },
-  grandTotal: {
-    type: Number,
-    default: 0
-  },
-
-  // Additional Info
-  notes: String,
-  status: {
-    type: String,
-    enum: ['Draft', 'Sent', 'Paid', 'Overdue'],
-    default: 'Draft'
-  },
-
-  // Timestamps
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
-}, { timestamps: true });
-
-// ==================== CALCULATE TOTALS METHOD ====================
-invoiceSchema.methods.calculateTotals = function() {
+// ==================== CREATE INVOICE ====================
+router.post('/create', async (req, res) => {
   try {
-    // Ensure items is an array
-    if (!Array.isArray(this.items)) {
-      this.items = [];
+    const {
+      invoiceNumber,
+      invoiceDate,
+      dueDate,
+      clientName,
+      clientEmail,
+      clientPhone,
+      clientAddress,
+      items,
+      sgstRate,
+      cgstRate,
+      igstRate,
+      notes
+    } = req.body;
+
+    console.log('📝 CREATE INVOICE REQUEST:', invoiceNumber);
+
+    // Validation
+    if (!invoiceNumber || !clientName || !clientEmail || !items || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required fields'
+      });
     }
 
-    // Calculate subtotal
-    this.subtotal = this.items.reduce((sum, item) => {
-      const qty = parseFloat(item.quantity) || 0;
-      const price = parseFloat(item.unitPrice) || 0;
-      return sum + (qty * price);
-    }, 0);
+    // Check if invoice number already exists
+    const existingInvoice = await Invoice.findOne({ invoiceNumber });
+    if (existingInvoice) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invoice number already exists'
+      });
+    }
 
-    // Calculate tax amounts
-    this.sgstAmount = parseFloat((this.subtotal * (this.sgstRate || 0)) / 100) || 0;
-    this.cgstAmount = parseFloat((this.subtotal * (this.cgstRate || 0)) / 100) || 0;
-    this.igstAmount = parseFloat((this.subtotal * (this.igstRate || 0)) / 100) || 0;
+    // Calculate item amounts
+    const calculatedItems = items.map(item => ({
+      ...item,
+      amount: item.quantity * item.unitPrice
+    }));
 
-    // Calculate grand total
-    this.grandTotal = this.subtotal + this.sgstAmount + this.cgstAmount + this.igstAmount;
-
-    console.log('📊 TOTALS CALCULATED:', {
-      subtotal: this.subtotal,
-      sgstAmount: this.sgstAmount,
-      cgstAmount: this.cgstAmount,
-      igstAmount: this.igstAmount,
-      grandTotal: this.grandTotal
+    // Create invoice
+    const newInvoice = new Invoice({
+      invoiceNumber,
+      invoiceDate: invoiceDate || new Date(),
+      dueDate,
+      userId: req.body.userId,
+      clientName,
+      clientEmail,
+      clientPhone,
+      clientAddress,
+      items: calculatedItems,
+      sgstRate: sgstRate || 0,
+      cgstRate: cgstRate || 0,
+      igstRate: igstRate || 0,
+      notes
     });
-  } catch (error) {
-    console.error('❌ Error calculating totals:', error);
-  }
 
-  return this;
-};
+    // Calculate totals
+    newInvoice.calculateTotals();
 
-// ==================== PRE-SAVE HOOK ====================
-invoiceSchema.pre('save', function(next) {
-  try {
-    // Only calculate totals if items exist
-    if (this.items && this.items.length > 0) {
-      this.calculateTotals();
-    }
-    next();
+    await newInvoice.save();
+    console.log('✅ Invoice created:', invoiceNumber);
+
+    res.status(201).json({
+      success: true,
+      message: 'Invoice created successfully',
+      data: newInvoice
+    });
+
   } catch (error) {
-    console.error('❌ Pre-save hook error:', error);
-    next(error);
+    console.error('❌ CREATE INVOICE ERROR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error creating invoice'
+    });
   }
 });
 
-const Invoice = mongoose.model('Invoice', invoiceSchema);
+// ==================== GET ALL INVOICES ====================
+router.get('/list/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
 
-module.exports = Invoice;
+    console.log('🔍 GET INVOICES FOR USER:', userId);
+
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID'
+      });
+    }
+
+    // ⭐ OPTIMIZED QUERY
+    const invoices = await Invoice.find({ userId })
+      .lean() // Fast read-only query
+      .sort({ invoiceDate: -1 });
+
+    console.log(`✅ Found ${invoices.length} invoices`);
+
+    res.json({
+      success: true,
+      data: invoices,
+      count: invoices.length
+    });
+
+  } catch (error) {
+    console.error('❌ GET INVOICES ERROR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching invoices'
+    });
+  }
+});
+
+// ==================== GET SINGLE INVOICE ====================
+router.get('/:invoiceId', async (req, res) => {
+  try {
+    const { invoiceId } = req.params;
+
+    console.log('🔍 GET INVOICE:', invoiceId);
+
+    const invoice = await Invoice.findById(invoiceId);
+
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invoice not found'
+      });
+    }
+
+    console.log('✅ Invoice found:', invoiceId);
+
+    res.json({
+      success: true,
+      data: invoice
+    });
+
+  } catch (error) {
+    console.error('❌ GET INVOICE ERROR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching invoice'
+    });
+  }
+});
+
+// ==================== UPDATE INVOICE ====================
+router.put('/update/:invoiceId', async (req, res) => {
+  try {
+    const { invoiceId } = req.params;
+    const updates = req.body;
+
+    console.log('📝 UPDATE INVOICE:', invoiceId);
+
+    const invoice = await Invoice.findByIdAndUpdate(invoiceId, updates, { new: true });
+
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invoice not found'
+      });
+    }
+
+    console.log('✅ Invoice updated:', invoiceId);
+
+    res.json({
+      success: true,
+      message: 'Invoice updated successfully',
+      data: invoice
+    });
+
+  } catch (error) {
+    console.error('❌ UPDATE INVOICE ERROR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error updating invoice'
+    });
+  }
+});
+
+// ==================== DELETE INVOICE ====================
+router.delete('/delete/:invoiceId', async (req, res) => {
+  try {
+    const { invoiceId } = req.params;
+
+    console.log('🗑️ DELETE INVOICE:', invoiceId);
+
+    const invoice = await Invoice.findByIdAndDelete(invoiceId);
+
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invoice not found'
+      });
+    }
+
+    console.log('✅ Invoice deleted:', invoiceId);
+
+    res.json({
+      success: true,
+      message: 'Invoice deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ DELETE INVOICE ERROR:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting invoice'
+    });
+  }
+});
+
+module.exports = router;
