@@ -11,6 +11,12 @@ export default function InvoicesPage() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+  // ⭐ SAFE NUMBER CONVERSION
+  const safeNumber = (value) => {
+    const num = parseFloat(value);
+    return isNaN(num) ? 0 : num;
+  };
+
   useEffect(() => {
     console.log('🔄 USEEFFECT RUNNING');
     
@@ -23,7 +29,7 @@ export default function InvoicesPage() {
         console.log('👤 PARSED USER OBJECT:', parsedUser);
         console.log('🔑 AVAILABLE KEYS:', Object.keys(parsedUser));
         console.log('🆔 user._id:', parsedUser._id);
-        console.log('���� user.id:', parsedUser.id);
+        console.log('🆔 user.id:', parsedUser.id);
         
         setUser(parsedUser);
         
@@ -42,6 +48,7 @@ export default function InvoicesPage() {
       console.error('❌ NO USER DATA IN STORAGE!');
     }
   }, []);
+
   const fetchInvoices = async (userId) => {
     try {
       console.log('🔍 FETCH INVOICES CALLED WITH userId:', userId);
@@ -73,9 +80,21 @@ export default function InvoicesPage() {
 
       console.log('✅ PARSED DATA:', data);
 
-      if (data.success) {
+      if (data.success && Array.isArray(data.data)) {
         console.log('✅ Invoices fetched:', data.count);
-        setInvoices(data.data);
+        
+        // ⭐ ENSURE ALL INVOICES HAVE REQUIRED FIELDS
+        const validInvoices = data.data.map(invoice => ({
+          ...invoice,
+          grandTotal: safeNumber(invoice.grandTotal),
+          subtotal: safeNumber(invoice.subtotal),
+          sgstAmount: safeNumber(invoice.sgstAmount),
+          cgstAmount: safeNumber(invoice.cgstAmount),
+          igstAmount: safeNumber(invoice.igstAmount),
+          status: (invoice.status || 'Draft').toLowerCase()
+        }));
+
+        setInvoices(validInvoices);
       } else {
         console.error('❌ API ERROR:', data.message);
       }
@@ -122,7 +141,7 @@ export default function InvoicesPage() {
       overdue: 'badge-overdue',
       cancelled: 'badge-cancelled'
     };
-    return statusMap[status] || 'badge-draft';
+    return statusMap[status?.toLowerCase()] || 'badge-draft';
   };
 
   const filteredInvoices = filter === 'all' 
@@ -233,18 +252,18 @@ export default function InvoicesPage() {
               {filteredInvoices.map(invoice => (
                 <div key={invoice._id} className="table-row">
                   <div className="col-invoice">
-                    <strong>{invoice.invoiceNumber}</strong>
+                    <strong>{invoice.invoiceNumber || 'N/A'}</strong>
                   </div>
-                  <div className="col-client">{invoice.clientName}</div>
+                  <div className="col-client">{invoice.clientName || 'N/A'}</div>
                   <div className="col-date">
-                    {new Date(invoice.invoiceDate).toLocaleDateString()}
+                    {invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A'}
                   </div>
                   <div className="col-amount">
-                    ₹{invoice.totalAmount.toFixed(2)}
+                    ₹{safeNumber(invoice.grandTotal).toFixed(2)}
                   </div>
                   <div className="col-status">
                     <span className={`badge ${getStatusBadge(invoice.status)}`}>
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      {invoice.status ? invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1) : 'Draft'}
                     </span>
                   </div>
                   <div className="col-actions">
@@ -291,7 +310,7 @@ export default function InvoicesPage() {
               <div className="stat-icon">💰</div>
               <div className="stat-info">
                 <h3>Total Amount</h3>
-                <p className="stat-value">₹{invoices.reduce((sum, inv) => sum + inv.totalAmount, 0).toFixed(2)}</p>
+                <p className="stat-value">₹{invoices.reduce((sum, inv) => sum + safeNumber(inv.grandTotal), 0).toFixed(2)}</p>
               </div>
             </div>
 

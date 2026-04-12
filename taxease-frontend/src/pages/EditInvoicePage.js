@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/CreateInvoicePage.css';
+import { useNavigate, useParams } from 'react-router-dom';
+import '../styles/EditInvoicePage.css';
 
-export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
+export default function EditInvoicePage() {
   const navigate = useNavigate();
+  const { invoiceId } = useParams();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
@@ -15,20 +17,13 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
     clientName: '',
     clientEmail: '',
     clientPhone: '',
-    clientAddress: {
-      street: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: 'India'
-    },
-    items: [
-      { description: '', quantity: 1, unitPrice: 0 }
-    ],
+    clientAddress: '',
+    items: [{ description: '', quantity: 1, unitPrice: 0 }],
     sgstRate: 9,
     cgstRate: 9,
     igstRate: 0,
-    notes: ''
+    notes: '',
+    status: 'Draft'
   });
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -37,30 +32,55 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
-      // Generate invoice number
-      setFormData(prev => ({
-        ...prev,
-        invoiceNumber: `INV-${Date.now()}`
-      }));
+      fetchInvoice();
+    } else {
+      navigate('/login');
     }
-  }, []);
+  }, [invoiceId]);
+
+  const fetchInvoice = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 Fetching invoice for edit:', invoiceId);
+
+      const response = await fetch(`${API_URL}/invoices/${invoiceId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('✅ Invoice fetched:', data.data);
+        setFormData(prev => ({
+          ...prev,
+          invoiceNumber: data.data.invoiceNumber,
+          invoiceDate: data.data.invoiceDate ? data.data.invoiceDate.split('T')[0] : '',
+          dueDate: data.data.dueDate ? data.data.dueDate.split('T')[0] : '',
+          clientName: data.data.clientName,
+          clientEmail: data.data.clientEmail,
+          clientPhone: data.data.clientPhone || '',
+          clientAddress: data.data.clientAddress || '',
+          items: data.data.items || [{ description: '', quantity: 1, unitPrice: 0 }],
+          sgstRate: data.data.sgstRate || 9,
+          cgstRate: data.data.cgstRate || 9,
+          igstRate: data.data.igstRate || 0,
+          notes: data.data.notes || '',
+          status: data.data.status || 'Draft'
+        }));
+        setError('');
+      } else {
+        setError('Invoice not found');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching invoice:', error);
+      setError('Error fetching invoice: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
-
-  const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      clientAddress: {
-        ...prev.clientAddress,
-        [name]: value
-      }
     }));
   };
 
@@ -114,8 +134,7 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
     e.preventDefault();
 
     try {
-      // ⭐ FORMAT CLIENT ADDRESS AS STRING
-      const clientAddressString = `${formData.clientAddress.street}, ${formData.clientAddress.city}, ${formData.clientAddress.state} ${formData.clientAddress.postalCode}`;
+      setSaving(true);
 
       const invoiceData = {
         invoiceNumber: formData.invoiceNumber,
@@ -124,20 +143,19 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
         clientName: formData.clientName,
         clientEmail: formData.clientEmail,
         clientPhone: formData.clientPhone,
-        clientAddress: clientAddressString, // ⭐ SEND AS STRING
+        clientAddress: formData.clientAddress,
         items: formData.items,
         sgstRate: formData.sgstRate,
         cgstRate: formData.cgstRate,
         igstRate: formData.igstRate,
         notes: formData.notes,
-        userId: user._id // ⭐ ADD USER ID
+        status: formData.status
       };
 
-      console.log('📤 SENDING INVOICE DATA:', invoiceData);
+      console.log('📤 UPDATING INVOICE:', invoiceData);
 
-      setLoading(true);
-      const response = await fetch(`${API_URL}/invoices/create`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/invoices/update/${invoiceId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -147,24 +165,61 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Invoice created successfully!');
-        alert('✅ Invoice created successfully!');
+        console.log('✅ Invoice updated successfully!');
+        alert('✅ Invoice updated successfully!');
         navigate('/invoices');
       } else {
         console.error('❌ Error:', data.message);
-        setError('Error creating invoice: ' + data.message);
+        setError('Error updating invoice: ' + data.message);
       }
 
     } catch (error) {
       console.error('❌ Error submitting invoice:', error);
       setError('Error: ' + error.message);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="edit-invoice-page">
+        <header className="dashboard-header">
+          <div className="header-content">
+            <div className="logo" onClick={() => navigate('/')}>
+              <span className="logo-icon">💼</span>
+              <span className="logo-text">TaxEase</span>
+            </div>
+          </div>
+        </header>
+        <div className="loading">Loading invoice...</div>
+      </div>
+    );
+  }
+
+  if (error && !formData.invoiceNumber) {
+    return (
+      <div className="edit-invoice-page">
+        <header className="dashboard-header">
+          <div className="header-content">
+            <div className="logo" onClick={() => navigate('/')}>
+              <span className="logo-icon">💼</span>
+              <span className="logo-text">TaxEase</span>
+            </div>
+          </div>
+        </header>
+        <main className="edit-invoice-content">
+          <div className="error-container">
+            <p>❌ {error}</p>
+            <button className="btn-back" onClick={() => navigate('/invoices')}>← Back to Invoices</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="create-invoice-page">
+    <div className="edit-invoice-page">
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
@@ -175,7 +230,7 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
 
           <nav className="nav-menu">
             <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
-            <button className="nav-item" onClick={() => navigate('/invoices')}>Invoices</button>
+            <button className="nav-item active" onClick={() => navigate('/invoices')}>Invoices</button>
             <button className="nav-item">Reports</button>
             <button className="nav-item">Settings</button>
           </nav>
@@ -188,10 +243,10 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
       </header>
 
       {/* Main Content */}
-      <main className="create-invoice-content">
+      <main className="edit-invoice-content">
         <div className="page-header">
-          <h1>Create Invoice</h1>
-          <p>Fill in the details below to create a new invoice</p>
+          <h1>Edit Invoice</h1>
+          <p>Update the invoice details below</p>
         </div>
 
         {error && <div className="error-alert">{error}</div>}
@@ -234,6 +289,21 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
                   onChange={handleInputChange}
                   required
                 />
+              </div>
+
+              <div className="form-group">
+                <label>Status *</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Sent">Sent</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Overdue">Overdue</option>
+                </select>
               </div>
             </div>
           </section>
@@ -278,44 +348,13 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
 
             <div className="form-row">
               <div className="form-group full">
-                <label>Street Address</label>
-                <input
-                  type="text"
-                  name="street"
-                  value={formData.clientAddress.street}
-                  onChange={handleAddressChange}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>City</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.clientAddress.city}
-                  onChange={handleAddressChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>State</label>
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.clientAddress.state}
-                  onChange={handleAddressChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Postal Code</label>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={formData.clientAddress.postalCode}
-                  onChange={handleAddressChange}
+                <label>Address</label>
+                <textarea
+                  name="clientAddress"
+                  value={formData.clientAddress}
+                  onChange={handleInputChange}
+                  rows="3"
+                  placeholder="Enter full address..."
                 />
               </div>
             </div>
@@ -505,9 +544,9 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
             <button 
               type="submit" 
               className="btn-submit"
-              disabled={loading}
+              disabled={saving}
             >
-              {loading ? 'Creating...' : '✅ Create Invoice'}
+              {saving ? 'Saving...' : '✅ Save Changes'}
             </button>
           </div>
         </form>

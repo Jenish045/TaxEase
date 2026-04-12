@@ -7,15 +7,23 @@ export default function ReportsPage() {
   const [user, setUser] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reportType, setReportType] = useState('monthly');
+  const [stats, setStats] = useState(null);
+  const [monthlySummary, setMonthlySummary] = useState([]);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+  // ⭐ SAFE NUMBER CONVERSION
+  const safeNumber = (value) => {
+    const num = parseFloat(value);
+    return isNaN(num) ? 0 : num;
+  };
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
-      setUser(JSON.parse(userData));
-      fetchInvoices(JSON.parse(userData)._id);
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      fetchInvoices(parsedUser._id);
     }
   }, []);
 
@@ -24,7 +32,14 @@ export default function ReportsPage() {
       console.log('🔍 Fetching invoices for reports...');
       const response = await fetch(`${API_URL}/invoices/list/${userId}`);
       const data = await response.json();
-      if (data.success) {
+      
+      if (data.success && Array.isArray(data.data)) {
+        console.log('📊 INVOICES FETCHED:', data.data.length);
+        console.log('📊 RAW INVOICES:', data.data);
+        
+        // ⭐ CALCULATE STATS IMMEDIATELY AFTER FETCHING
+        calculateAndSetStats(data.data);
+        calculateAndSetMonthlySummary(data.data);
         setInvoices(data.data);
       }
     } catch (error) {
@@ -34,6 +49,69 @@ export default function ReportsPage() {
     }
   };
 
+  const calculateAndSetStats = (invoiceList) => {
+    console.log('📊 CALCULATING STATS FROM:', invoiceList.length, 'invoices');
+
+    const totalInvoices = invoiceList.length;
+
+    const totalAmount = invoiceList.reduce((sum, inv) => {
+      const amount = safeNumber(inv.grandTotal);
+      console.log('💰 Invoice:', inv.invoiceNumber, 'grandTotal:', inv.grandTotal, 'Safe:', amount);
+      return sum + amount;
+    }, 0);
+
+    const paidAmount = invoiceList
+      .filter(inv => inv.status === 'paid')
+      .reduce((sum, inv) => sum + safeNumber(inv.grandTotal), 0);
+
+    const pendingAmount = totalAmount - paidAmount;
+
+    const totalTax = invoiceList.reduce((sum, inv) => {
+      const sgst = safeNumber(inv.sgstAmount);
+      const cgst = safeNumber(inv.cgstAmount);
+      const igst = safeNumber(inv.igstAmount);
+      const tax = sgst + cgst + igst;
+      console.log('🔢 Invoice:', inv.invoiceNumber, 'Tax Breakdown - SGST:', sgst, 'CGST:', cgst, 'IGST:', igst, 'Total:', tax);
+      return sum + tax;
+    }, 0);
+
+    const calculatedStats = {
+      totalInvoices,
+      totalAmount,
+      paidAmount,
+      pendingAmount,
+      totalTax
+    };
+
+    console.log('✅ FINAL CALCULATED STATS:', calculatedStats);
+    setStats(calculatedStats);
+  };
+
+  const calculateAndSetMonthlySummary = (invoiceList) => {
+    const summary = {};
+    
+    invoiceList.forEach(invoice => {
+      if (!invoice.invoiceDate) return;
+
+      const date = new Date(invoice.invoiceDate);
+      const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+      
+      if (!summary[monthYear]) {
+        summary[monthYear] = { count: 0, amount: 0, tax: 0 };
+      }
+
+      summary[monthYear].count++;
+      summary[monthYear].amount += safeNumber(invoice.grandTotal);
+
+      const tax = safeNumber(invoice.sgstAmount) + safeNumber(invoice.cgstAmount) + safeNumber(invoice.igstAmount);
+      summary[monthYear].tax += tax;
+    });
+
+    const sorted = Object.entries(summary).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+    console.log('📅 MONTHLY SUMMARY:', sorted);
+    setMonthlySummary(sorted);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -41,38 +119,12 @@ export default function ReportsPage() {
     navigate('/login');
   };
 
-  const calculateStats = () => {
-    const totalInvoices = invoices.length;
-    const totalAmount = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
-    const paidAmount = invoices
-      .filter(inv => inv.status === 'paid')
-      .reduce((sum, inv) => sum + inv.totalAmount, 0);
-    const pendingAmount = totalAmount - paidAmount;
-    const totalTax = invoices.reduce((sum, inv) => sum + inv.totalTax, 0);
-
-    return { totalInvoices, totalAmount, paidAmount, pendingAmount, totalTax };
-  };
-
-  const getMonthlySummary = () => {
-    const summary = {};
-    invoices.forEach(invoice => {
-      const date = new Date(invoice.invoiceDate);
-      const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
-      if (!summary[monthYear]) {
-        summary[monthYear] = { count: 0, amount: 0, tax: 0 };
-      }
-      summary[monthYear].count++;
-      summary[monthYear].amount += invoice.totalAmount;
-      summary[monthYear].tax += invoice.totalTax;
-    });
-    return Object.entries(summary);
-  };
-
-  const stats = calculateStats();
-  const monthlySummary = getMonthlySummary();
-
   if (loading) {
     return <div className="loading">Loading reports...</div>;
+  }
+
+  if (!stats) {
+    return <div className="loading">Calculating reports...</div>;
   }
 
   return (
@@ -120,7 +172,7 @@ export default function ReportsPage() {
             <div className="stat-icon">💰</div>
             <div className="stat-info">
               <h3>Total Revenue</h3>
-              <p className="stat-value">₹{stats.totalAmount.toFixed(2)}</p>
+              <p className="stat-value">₹{safeNumber(stats.totalAmount).toFixed(2)}</p>
             </div>
           </div>
 
@@ -128,7 +180,7 @@ export default function ReportsPage() {
             <div className="stat-icon">✅</div>
             <div className="stat-info">
               <h3>Paid Amount</h3>
-              <p className="stat-value">₹{stats.paidAmount.toFixed(2)}</p>
+              <p className="stat-value">₹{safeNumber(stats.paidAmount).toFixed(2)}</p>
             </div>
           </div>
 
@@ -136,7 +188,7 @@ export default function ReportsPage() {
             <div className="stat-icon">⏳</div>
             <div className="stat-info">
               <h3>Pending Amount</h3>
-              <p className="stat-value">₹{stats.pendingAmount.toFixed(2)}</p>
+              <p className="stat-value">₹{safeNumber(stats.pendingAmount).toFixed(2)}</p>
             </div>
           </div>
 
@@ -144,7 +196,7 @@ export default function ReportsPage() {
             <div className="stat-icon">📈</div>
             <div className="stat-info">
               <h3>Total Tax</h3>
-              <p className="stat-value">₹{stats.totalTax.toFixed(2)}</p>
+              <p className="stat-value">₹{safeNumber(stats.totalTax).toFixed(2)}</p>
             </div>
           </div>
 
@@ -153,7 +205,7 @@ export default function ReportsPage() {
             <div className="stat-info">
               <h3>Tax %</h3>
               <p className="stat-value">
-                {stats.totalAmount > 0 ? ((stats.totalTax / stats.totalAmount) * 100).toFixed(1) : 0}%
+                {safeNumber(stats.totalAmount) > 0 ? ((safeNumber(stats.totalTax) / safeNumber(stats.totalAmount)) * 100).toFixed(1) : 0}%
               </p>
             </div>
           </div>
@@ -180,8 +232,8 @@ export default function ReportsPage() {
                 <div key={month} className="table-row">
                   <div className="col-month">{month}</div>
                   <div className="col-count">{data.count}</div>
-                  <div className="col-amount">₹{data.amount.toFixed(2)}</div>
-                  <div className="col-tax">₹{data.tax.toFixed(2)}</div>
+                  <div className="col-amount">₹{safeNumber(data.amount).toFixed(2)}</div>
+                  <div className="col-tax">₹{safeNumber(data.tax).toFixed(2)}</div>
                 </div>
               ))}
             </div>
@@ -195,31 +247,31 @@ export default function ReportsPage() {
           <div className="status-grid">
             <div className="status-card">
               <div className="status-badge draft">Draft</div>
-              <p className="status-count">{invoices.filter(i => i.status === 'draft').length}</p>
+              <p className="status-count">{invoices.filter(i => (i.status || 'draft').toLowerCase() === 'draft').length}</p>
               <p className="status-label">Invoices</p>
             </div>
 
             <div className="status-card">
               <div className="status-badge sent">Sent</div>
-              <p className="status-count">{invoices.filter(i => i.status === 'sent').length}</p>
+              <p className="status-count">{invoices.filter(i => (i.status || '').toLowerCase() === 'sent').length}</p>
               <p className="status-label">Invoices</p>
             </div>
 
             <div className="status-card">
               <div className="status-badge paid">Paid</div>
-              <p className="status-count">{invoices.filter(i => i.status === 'paid').length}</p>
+              <p className="status-count">{invoices.filter(i => (i.status || '').toLowerCase() === 'paid').length}</p>
               <p className="status-label">Invoices</p>
             </div>
 
             <div className="status-card">
               <div className="status-badge overdue">Overdue</div>
-              <p className="status-count">{invoices.filter(i => i.status === 'overdue').length}</p>
+              <p className="status-count">{invoices.filter(i => (i.status || '').toLowerCase() === 'overdue').length}</p>
               <p className="status-label">Invoices</p>
             </div>
 
             <div className="status-card">
               <div className="status-badge cancelled">Cancelled</div>
-              <p className="status-count">{invoices.filter(i => i.status === 'cancelled').length}</p>
+              <p className="status-count">{invoices.filter(i => (i.status || '').toLowerCase() === 'cancelled').length}</p>
               <p className="status-label">Invoices</p>
             </div>
           </div>

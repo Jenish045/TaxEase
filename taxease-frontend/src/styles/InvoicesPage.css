@@ -318,8 +318,12 @@ body {
   justify-content: flex-end;
 }
 
+/* ==================== ACTION BUTTONS ==================== */
+
+/* ==================== ACTION BUTTONS ==================== */
+
 .btn-action {
-  background: none;
+  background: none !important;  /* ⭐ FORCE NO BACKGROUND */
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
@@ -333,7 +337,7 @@ body {
 }
 
 .btn-edit:hover {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(30, 64, 175, 0.1);
 }
 
 .btn-delete:hover {

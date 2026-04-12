@@ -6,6 +6,8 @@ import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import InvoicesPage from './pages/InvoicesPage';
 import CreateInvoicePage from './pages/CreateInvoicePage';
+import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import EditInvoicePage from './pages/EditInvoicePage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -43,6 +45,24 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateInvoicePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/invoice/:invoiceId"
+          element={
+            <ProtectedRoute>
+              <InvoiceDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-invoice/:invoiceId"
+          element={
+            <ProtectedRoute>
+              <EditInvoicePage />
             </ProtectedRoute>
           }
         />
