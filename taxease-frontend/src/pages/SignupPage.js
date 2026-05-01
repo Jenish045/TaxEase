@@ -17,11 +17,7 @@ export default function SignupPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`✏️ ${name} changed:`, value);
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSignup = async (e) => {
@@ -30,43 +26,26 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      console.log('📝 SIGNUP ATTEMPT');
-      console.log('📤 Sending:', formData);
-
       const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
-      console.log('📡 Response status:', response.status);
       const data = await response.json();
-      console.log('📡 Response data:', data);
 
       if (data.success) {
-        console.log('✅ Signup successful!');
-        
-        // Store tokens
         localStorage.setItem('accessToken', data.data.accessToken);
         localStorage.setItem('refreshToken', data.data.refreshToken);
-        
-        // Store user with both id and _id for compatibility
-        const userData = {
-          ...data.data.user,
-          _id: data.data.user.id  // Add _id from id
-        };
+
+        const userData = { ...data.data.user, _id: data.data.user.id };
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log('💾 User stored:', userData);
 
         navigate('/dashboard');
       } else {
-        console.log('❌ Signup failed:', data.message);
         setError(data.message || 'Signup failed');
       }
     } catch (err) {
-      console.error('❌ Signup error:', err);
       setError(err.message || 'Error connecting to server');
     } finally {
       setLoading(false);
@@ -75,7 +54,6 @@ export default function SignupPage() {
 
   return (
     <div className="signup-page">
-      {/* Header */}
       <header className="header">
         <div className="header-content">
           <div className="logo" onClick={() => navigate('/')}>
@@ -89,7 +67,6 @@ export default function SignupPage() {
         </div>
       </header>
 
-      {/* Signup Form */}
       <section className="signup-container">
         <div className="signup-box">
           <h1>Create Account</h1>
@@ -150,11 +127,7 @@ export default function SignupPage() {
               />
             </div>
 
-            <button 
-              type="submit" 
-              className="btn-signup"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-signup" disabled={loading}>
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
@@ -165,7 +138,6 @@ export default function SignupPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <p>&copy; 2026 TaxEase. All rights reserved.</p>
       </footer>

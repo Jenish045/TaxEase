@@ -17,66 +17,34 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log('🔐 LOGIN ATTEMPT');
-      console.log('📧 Email:', email);
-      console.log('🔑 Password length:', password.length);
-      console.log('🔑 Password:', password); // ✅ DEBUG
-
-      // ✅ MAKE SURE WE'RE SENDING THE FULL PASSWORD
-      const loginData = {
-        email: email.trim(),
-        password: password // ✅ SEND RAW PASSWORD
-      };
-
-      console.log('📤 Sending:', loginData);
-
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loginData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password })
       });
 
-      console.log('📡 Response status:', response.status);
       const data = await response.json();
-      console.log('📡 Response data:', data);
 
       if (data.success) {
-        console.log('✅ Login successful!');
-        
-        // Store tokens
         localStorage.setItem('accessToken', data.data.accessToken);
         localStorage.setItem('refreshToken', data.data.refreshToken);
-        
-        // Store user with both id and _id for compatibility
-        const userData = {
-          ...data.data.user,
-          _id: data.data.user.id  // Add _id from id
-        };
+
+        const userData = { ...data.data.user, _id: data.data.user.id };
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log('💾 User stored:', userData);
 
         navigate('/dashboard');
       } else {
-        console.log('❌ Login failed:', data.message);
         setError(data.message || 'Login failed');
       }
     } catch (err) {
-      console.error('❌ Login error:', err);
       setError(err.message || 'Error connecting to server');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSignup = () => {
-    navigate('/signup');
-  };
-
   return (
     <div className="login-page">
-      {/* Header */}
       <header className="header">
         <div className="header-content">
           <div className="logo" onClick={() => navigate('/')}>
@@ -85,12 +53,11 @@ export default function LoginPage() {
           </div>
           <div className="header-nav">
             <button onClick={() => navigate('/')} className="nav-link">Home</button>
-            <button onClick={handleSignup} className="btn-signup">Sign Up</button>
+            <button onClick={() => navigate('/signup')} className="btn-signup">Sign Up</button>
           </div>
         </div>
       </header>
 
-      {/* Login Form */}
       <section className="login-container">
         <div className="login-box">
           <h1>Welcome Back</h1>
@@ -105,11 +72,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  console.log('✏️ Email changed:', val);
-                  setEmail(val);
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
               />
@@ -121,32 +84,23 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  console.log('✏️ Password changed, length:', val.length);
-                  setPassword(val);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
               />
             </div>
 
-            <button 
-              type="submit" 
-              className="btn-login"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-login" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
           <p className="signup-link">
-            Don't have an account? <button onClick={handleSignup} className="link-button">Sign up here</button>
+            Don't have an account? <button onClick={() => navigate('/signup')} className="link-button">Sign up here</button>
           </p>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <p>&copy; 2026 TaxEase. All rights reserved.</p>
       </footer>

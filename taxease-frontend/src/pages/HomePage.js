@@ -15,7 +15,7 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      {/* ==================== HEADER ==================== */}
+      {/* Header */}
       <header className="header">
         <div className="header-content">
           <div className="logo">
@@ -47,7 +47,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ==================== HERO SECTION ==================== */}
+      {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <h1>Financial Automation System</h1>
@@ -66,7 +66,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ==================== WHY CHOOSE TAXEASE ==================== */}
+      {/* Why Choose TaxEase */}
       <section className="why-choose">
         <h2>Why Choose TaxEase?</h2>
         <div className="features-grid">
@@ -75,31 +75,26 @@ export default function HomePage() {
             <h3>Smart OCR</h3>
             <p>Automatically extract invoice data using advanced AI-powered OCR technology</p>
           </div>
-
           <div className="feature-card">
             <div className="feature-icon">💰</div>
             <h3>Tax Calculation</h3>
             <p>Calculate SGST, CGST, IGST automatically with GST compliance</p>
           </div>
-
           <div className="feature-card">
             <div className="feature-icon">📊</div>
             <h3>Reports</h3>
             <p>Generate comprehensive tax reports and invoices in seconds</p>
           </div>
-
           <div className="feature-card">
             <div className="feature-icon">🔒</div>
             <h3>Secure</h3>
             <p>Your data is encrypted and stored securely in the cloud</p>
           </div>
-
           <div className="feature-card">
             <div className="feature-icon">⚡</div>
             <h3>Fast</h3>
             <p>Process multiple invoices in minutes, not hours</p>
           </div>
-
           <div className="feature-card">
             <div className="feature-icon">🌐</div>
             <h3>Accessible</h3>
@@ -108,7 +103,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ==================== HOW IT WORKS ==================== */}
+      {/* How It Works */}
       <section className="how-it-works">
         <h2>How It Works</h2>
         <div className="steps-grid">
@@ -117,19 +112,16 @@ export default function HomePage() {
             <h3>Upload Invoice</h3>
             <p>Upload your PDF invoice or enter details manually</p>
           </div>
-
           <div className="step">
             <div className="step-number">2</div>
             <h3>Extract Data</h3>
             <p>Our AI extracts all invoice details automatically</p>
           </div>
-
           <div className="step">
             <div className="step-number">3</div>
             <h3>Calculate Tax</h3>
             <p>Tax amounts are calculated based on GST rates</p>
           </div>
-
           <div className="step">
             <div className="step-number">4</div>
             <h3>Generate Reports</h3>
@@ -138,7 +130,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ==================== PRICING ==================== */}
+      {/* Pricing */}
       <section className="pricing">
         <h2>Simple, Transparent Pricing</h2>
         <div className="pricing-grid">
@@ -184,7 +176,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ==================== FOOTER ==================== */}
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
@@ -194,15 +186,16 @@ export default function HomePage() {
           <div className="footer-section">
             <h4>Quick Links</h4>
             <ul>
-              <button onClick={() => navigate('/#features')}>Features</button>              <li><a href="#pricing">Pricing</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#pricing">Pricing</a></li>
               <li><a href="#contact">Contact</a></li>
             </ul>
           </div>
           <div className="footer-section">
             <h4>Legal</h4>
             <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#/">Privacy Policy</a></li>
+              <li><a href="#/">Terms of Service</a></li>
             </ul>
           </div>
         </div>

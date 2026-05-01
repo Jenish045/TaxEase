@@ -12,13 +12,11 @@ export default function InvoiceDetailPage() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // ⭐ SAFE NUMBER CONVERSION
   const safeNumber = (value) => {
     const num = parseFloat(value);
     return isNaN(num) ? 0 : num;
   };
 
-  // ⭐ SAFE FORMAT DATE
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -36,25 +34,26 @@ export default function InvoiceDetailPage() {
     } else {
       navigate('/login');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId]);
 
   const fetchInvoice = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching invoice:', invoiceId);
+
 
       const response = await fetch(`${API_URL}/invoices/${invoiceId}`);
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Invoice fetched:', data.data);
+
         setInvoice(data.data);
         setError('');
       } else {
         setError('Invoice not found');
       }
     } catch (error) {
-      console.error('❌ Error fetching invoice:', error);
+
       setError('Error fetching invoice: ' + error.message);
     } finally {
       setLoading(false);

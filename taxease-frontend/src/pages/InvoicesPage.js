@@ -11,79 +11,43 @@ export default function InvoicesPage() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // ⭐ SAFE NUMBER CONVERSION
   const safeNumber = (value) => {
     const num = parseFloat(value);
     return isNaN(num) ? 0 : num;
   };
 
   useEffect(() => {
-    console.log('🔄 USEEFFECT RUNNING');
-    
     const userData = localStorage.getItem('user');
-    console.log('📦 RAW USER DATA FROM STORAGE:', userData);
-    
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log('👤 PARSED USER OBJECT:', parsedUser);
-        console.log('🔑 AVAILABLE KEYS:', Object.keys(parsedUser));
-        console.log('🆔 user._id:', parsedUser._id);
-        console.log('🆔 user.id:', parsedUser.id);
-        
         setUser(parsedUser);
-        
         const userIdToUse = parsedUser._id || parsedUser.id;
-        console.log('✅ USERID TO USE:', userIdToUse);
-        
         if (userIdToUse) {
           fetchInvoices(userIdToUse);
-        } else {
-          console.error('❌ NO VALID USER ID FOUND!');
         }
       } catch (error) {
-        console.error('❌ ERROR PARSING USER:', error);
+        // Failed to parse user data
       }
-    } else {
-      console.error('❌ NO USER DATA IN STORAGE!');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchInvoices = async (userId) => {
     try {
-      console.log('🔍 FETCH INVOICES CALLED WITH userId:', userId);
-      console.log('🔍 TYPE OF userId:', typeof userId);
-      
-      if (!userId || userId === 'undefined') {
-        console.error('❌ USERID IS INVALID:', userId);
-        return;
-      }
+      if (!userId || userId === 'undefined') return;
 
-      const url = `${API_URL}/invoices/list/${userId}`;
-      console.log('🔗 FETCHING FROM URL:', url);
-
-      const response = await fetch(url);
-      console.log('📊 RESPONSE STATUS:', response.status);
-      console.log('📊 RESPONSE OK:', response.ok);
-
+      const response = await fetch(`${API_URL}/invoices/list/${userId}`);
       const text = await response.text();
-      console.log('📝 RAW RESPONSE:', text);
 
       let data;
       try {
         data = JSON.parse(text);
       } catch (parseError) {
-        console.error('❌ JSON PARSE ERROR:', parseError);
-        console.error('❌ TRIED TO PARSE:', text);
         return;
       }
 
-      console.log('✅ PARSED DATA:', data);
-
       if (data.success && Array.isArray(data.data)) {
-        console.log('✅ Invoices fetched:', data.count);
-        
-        // ⭐ ENSURE ALL INVOICES HAVE REQUIRED FIELDS
         const validInvoices = data.data.map(invoice => ({
           ...invoice,
           grandTotal: safeNumber(invoice.grandTotal),
@@ -93,13 +57,10 @@ export default function InvoicesPage() {
           igstAmount: safeNumber(invoice.igstAmount),
           status: (invoice.status || 'Draft').toLowerCase()
         }));
-
         setInvoices(validInvoices);
-      } else {
-        console.error('❌ API ERROR:', data.message);
       }
     } catch (error) {
-      console.error('❌ Error fetching invoices:', error);
+      // Network error
     } finally {
       setLoading(false);
     }
@@ -113,23 +74,18 @@ export default function InvoicesPage() {
   };
 
   const handleDelete = async (invoiceId) => {
-    if (!window.confirm('Are you sure you want to delete this invoice?')) {
-      return;
-    }
+    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
 
     try {
-      console.log('🗑️ Deleting invoice:', invoiceId);
       const response = await fetch(`${API_URL}/invoices/delete/${invoiceId}`, {
         method: 'DELETE'
       });
       const data = await response.json();
-
       if (data.success) {
-        console.log('✅ Invoice deleted');
         setInvoices(invoices.filter(inv => inv._id !== invoiceId));
       }
     } catch (error) {
-      console.error('❌ Error deleting invoice:', error);
+      // Delete failed
     }
   };
 
@@ -144,8 +100,8 @@ export default function InvoicesPage() {
     return statusMap[status?.toLowerCase()] || 'badge-draft';
   };
 
-  const filteredInvoices = filter === 'all' 
-    ? invoices 
+  const filteredInvoices = filter === 'all'
+    ? invoices
     : invoices.filter(inv => inv.status === filter);
 
   if (loading) {
@@ -154,21 +110,18 @@ export default function InvoicesPage() {
 
   return (
     <div className="invoices-page">
-      {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
           <div className="logo" onClick={() => navigate('/')}>
             <span className="logo-icon">💼</span>
             <span className="logo-text">TaxEase</span>
           </div>
-
           <nav className="nav-menu">
             <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
             <button className="nav-item active" onClick={() => navigate('/invoices')}>Invoices</button>
             <button className="nav-item" onClick={() => navigate('/reports')}>Reports</button>
             <button className="nav-item" onClick={() => navigate('/settings')}>Settings</button>
           </nav>
-
           <div className="user-section">
             <span className="user-name">👤 {user?.firstName} {user?.lastName}</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
@@ -176,65 +129,42 @@ export default function InvoicesPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="invoices-content">
-        {/* Page Header */}
         <div className="page-header">
           <div>
             <h1>Invoices</h1>
             <p>Manage all your invoices in one place</p>
           </div>
-          <button 
-            className="btn-create-invoice"
-            onClick={() => navigate('/create-invoice')}
-          >
+          <button className="btn-create-invoice" onClick={() => navigate('/create-invoice')}>
             ➕ Create Invoice
           </button>
         </div>
 
-        {/* Filter Section */}
+        {/* Filter */}
         <div className="filter-section">
-          <button 
-            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-          >
+          <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
             All ({invoices.length})
           </button>
-          <button 
-            className={`filter-btn ${filter === 'draft' ? 'active' : ''}`}
-            onClick={() => setFilter('draft')}
-          >
+          <button className={`filter-btn ${filter === 'draft' ? 'active' : ''}`} onClick={() => setFilter('draft')}>
             Draft ({invoices.filter(i => i.status === 'draft').length})
           </button>
-          <button 
-            className={`filter-btn ${filter === 'sent' ? 'active' : ''}`}
-            onClick={() => setFilter('sent')}
-          >
+          <button className={`filter-btn ${filter === 'sent' ? 'active' : ''}`} onClick={() => setFilter('sent')}>
             Sent ({invoices.filter(i => i.status === 'sent').length})
           </button>
-          <button 
-            className={`filter-btn ${filter === 'paid' ? 'active' : ''}`}
-            onClick={() => setFilter('paid')}
-          >
+          <button className={`filter-btn ${filter === 'paid' ? 'active' : ''}`} onClick={() => setFilter('paid')}>
             Paid ({invoices.filter(i => i.status === 'paid').length})
           </button>
-          <button 
-            className={`filter-btn ${filter === 'overdue' ? 'active' : ''}`}
-            onClick={() => setFilter('overdue')}
-          >
+          <button className={`filter-btn ${filter === 'overdue' ? 'active' : ''}`} onClick={() => setFilter('overdue')}>
             Overdue ({invoices.filter(i => i.status === 'overdue').length})
           </button>
         </div>
 
-        {/* Invoices Table/List */}
+        {/* Invoice List */}
         <div className="invoices-container">
           {filteredInvoices.length === 0 ? (
             <div className="empty-state">
               <p>📄 No invoices found</p>
-              <button 
-                className="btn-create-invoice"
-                onClick={() => navigate('/create-invoice')}
-              >
+              <button className="btn-create-invoice" onClick={() => navigate('/create-invoice')}>
                 Create your first invoice
               </button>
             </div>
@@ -248,7 +178,6 @@ export default function InvoicesPage() {
                 <div className="col-status">Status</div>
                 <div className="col-actions">Actions</div>
               </div>
-
               {filteredInvoices.map(invoice => (
                 <div key={invoice._id} className="table-row">
                   <div className="col-invoice">
@@ -258,36 +187,16 @@ export default function InvoicesPage() {
                   <div className="col-date">
                     {invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A'}
                   </div>
-                  <div className="col-amount">
-                    ₹{safeNumber(invoice.grandTotal).toFixed(2)}
-                  </div>
+                  <div className="col-amount">₹{safeNumber(invoice.grandTotal).toFixed(2)}</div>
                   <div className="col-status">
                     <span className={`badge ${getStatusBadge(invoice.status)}`}>
                       {invoice.status ? invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1) : 'Draft'}
                     </span>
                   </div>
                   <div className="col-actions">
-                    <button 
-                      className="btn-action btn-view"
-                      onClick={() => navigate(`/invoice/${invoice._id}`)}
-                      title="View Invoice"
-                    >
-                      👁️
-                    </button>
-                    <button 
-                      className="btn-action btn-edit"
-                      onClick={() => navigate(`/edit-invoice/${invoice._id}`)}
-                      title="Edit Invoice"
-                    >
-                      ✏️
-                    </button>
-                    <button 
-                      className="btn-action btn-delete"
-                      onClick={() => handleDelete(invoice._id)}
-                      title="Delete Invoice"
-                    >
-                      🗑️
-                    </button>
+                    <button className="btn-action btn-view" onClick={() => navigate(`/invoice/${invoice._id}`)} title="View">👁️</button>
+                    <button className="btn-action btn-edit" onClick={() => navigate(`/edit-invoice/${invoice._id}`)} title="Edit">✏️</button>
+                    <button className="btn-action btn-delete" onClick={() => handleDelete(invoice._id)} title="Delete">🗑️</button>
                   </div>
                 </div>
               ))}
@@ -295,7 +204,7 @@ export default function InvoicesPage() {
           )}
         </div>
 
-        {/* Stats Section */}
+        {/* Stats */}
         {invoices.length > 0 && (
           <div className="stats-section">
             <div className="stat-card">
@@ -305,7 +214,6 @@ export default function InvoicesPage() {
                 <p className="stat-value">{invoices.length}</p>
               </div>
             </div>
-
             <div className="stat-card">
               <div className="stat-icon">💰</div>
               <div className="stat-info">
@@ -313,7 +221,6 @@ export default function InvoicesPage() {
                 <p className="stat-value">₹{invoices.reduce((sum, inv) => sum + safeNumber(inv.grandTotal), 0).toFixed(2)}</p>
               </div>
             </div>
-
             <div className="stat-card">
               <div className="stat-icon">✅</div>
               <div className="stat-info">
@@ -321,7 +228,6 @@ export default function InvoicesPage() {
                 <p className="stat-value">{invoices.filter(i => i.status === 'paid').length}</p>
               </div>
             </div>
-
             <div className="stat-card">
               <div className="stat-icon">⚠️</div>
               <div className="stat-info">
@@ -333,7 +239,6 @@ export default function InvoicesPage() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="dashboard-footer">
         <p>&copy; 2026 TaxEase. All rights reserved.</p>
       </footer>

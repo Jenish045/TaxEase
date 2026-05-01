@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/CreateInvoicePage.css';
 
-export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
+export default function CreateInvoicePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,7 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
         invoiceNumber: `INV-${Date.now()}`
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (e) => {
@@ -114,7 +115,6 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
     e.preventDefault();
 
     try {
-      // ⭐ FORMAT CLIENT ADDRESS AS STRING
       const clientAddressString = `${formData.clientAddress.street}, ${formData.clientAddress.city}, ${formData.clientAddress.state} ${formData.clientAddress.postalCode}`;
 
       const invoiceData = {
@@ -124,16 +124,16 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
         clientName: formData.clientName,
         clientEmail: formData.clientEmail,
         clientPhone: formData.clientPhone,
-        clientAddress: clientAddressString, // ⭐ SEND AS STRING
+        clientAddress: clientAddressString,
         items: formData.items,
         sgstRate: formData.sgstRate,
         cgstRate: formData.cgstRate,
         igstRate: formData.igstRate,
         notes: formData.notes,
-        userId: user._id // ⭐ ADD USER ID
+        userId: user._id
       };
 
-      console.log('📤 SENDING INVOICE DATA:', invoiceData);
+
 
       setLoading(true);
       const response = await fetch(`${API_URL}/invoices/create`, {
@@ -147,16 +147,14 @@ export default function CreateInvoicePage() {  // ⭐ FIXED FUNCTION NAME
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Invoice created successfully!');
-        alert('✅ Invoice created successfully!');
+        alert('Invoice created successfully!');
         navigate('/invoices');
       } else {
-        console.error('❌ Error:', data.message);
         setError('Error creating invoice: ' + data.message);
       }
 
     } catch (error) {
-      console.error('❌ Error submitting invoice:', error);
+
       setError('Error: ' + error.message);
     } finally {
       setLoading(false);

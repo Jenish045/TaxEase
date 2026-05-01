@@ -17,12 +17,7 @@ router.post('/signup', async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
-    console.log('📝 SIGNUP REQUEST:', { 
-      firstName, 
-      lastName, 
-      email, 
-      passwordLength: password.length 
-    });
+    console.log('[Auth] Signup request:', { email });
 
     // Validation
     if (!firstName || !lastName || !email || !password) {
@@ -42,18 +37,14 @@ router.post('/signup', async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
     if (existingUser) {
-      console.log('❌ User already exists:', email);
+      console.log('[Auth] User already exists:', email);
       return res.status(400).json({
         success: false,
         message: 'Email already registered'
       });
     }
 
-    // Hash password
-    console.log('🔐 Hashing password...');
     const hashedPassword = hashPassword(password);
-    console.log('✅ Password hashed');
-    console.log('🔐 Stored hash:', hashedPassword);
 
     // Create user
     const newUser = new User({
@@ -64,7 +55,7 @@ router.post('/signup', async (req, res) => {
     });
 
     await newUser.save();
-    console.log('✅ User saved to database:', newUser.email);
+    console.log('[Auth] User saved to database:', newUser.email);
 
     // Generate tokens
     const accessToken = jwt.sign(
@@ -79,7 +70,7 @@ router.post('/signup', async (req, res) => {
       { expiresIn: '30d' }
     );
 
-    console.log('✅ SIGNUP SUCCESS:', newUser.email);
+    console.log('[Auth] Signup successful:', newUser.email);
 
     res.status(201).json({
       success: true,
@@ -97,7 +88,7 @@ router.post('/signup', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ SIGNUP ERROR:', error);
+    console.error('[Auth] Signup error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error creating account'
@@ -110,10 +101,7 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔐 LOGIN REQUEST:', { 
-      email, 
-      passwordLength: password.length 
-    });
+    console.log('[Auth] Login request:', { email });
 
     // Validation
     if (!email || !password) {
@@ -124,40 +112,26 @@ router.post('/login', async (req, res) => {
     }
 
     // Find user
-    console.log('🔍 Finding user:', email.toLowerCase().trim());
     const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
     
     if (!user) {
-      console.log('❌ User not found:', email.toLowerCase().trim());
+      console.log('[Auth] Login failed: User not found:', email);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
 
-    console.log('✅ User found:', user.email);
-
-    // Hash input password and compare
-    console.log('🔐 Comparing passwords...');
     const inputHash = hashPassword(password);
-    
-    console.log('📝 Input password:', password);
-    console.log('📝 Input hash:', inputHash);
-    console.log('📝 Stored hash:', user.password);
-
     const isPasswordValid = inputHash === user.password;
     
-    console.log('🔐 Password match result:', isPasswordValid);
-
     if (!isPasswordValid) {
-      console.log('❌ Password mismatch for:', email);
+      console.log('[Auth] Login failed: Password mismatch for:', email);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
-
-    console.log('✅ Password correct!');
 
     // Generate tokens
     const accessToken = jwt.sign(
@@ -172,7 +146,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '30d' }
     );
 
-    console.log('✅ LOGIN SUCCESS:', user.email);
+    console.log('[Auth] Login successful:', user.email);
 
     res.json({
       success: true,
@@ -190,7 +164,7 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ LOGIN ERROR:', error);
+    console.error('[Auth] Login error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error during login'

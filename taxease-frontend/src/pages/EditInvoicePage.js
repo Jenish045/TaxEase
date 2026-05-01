@@ -36,18 +36,19 @@ export default function EditInvoicePage() {
     } else {
       navigate('/login');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId]);
 
   const fetchInvoice = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching invoice for edit:', invoiceId);
+
 
       const response = await fetch(`${API_URL}/invoices/${invoiceId}`);
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Invoice fetched:', data.data);
+
         setFormData(prev => ({
           ...prev,
           invoiceNumber: data.data.invoiceNumber,
@@ -69,7 +70,7 @@ export default function EditInvoicePage() {
         setError('Invoice not found');
       }
     } catch (error) {
-      console.error('❌ Error fetching invoice:', error);
+
       setError('Error fetching invoice: ' + error.message);
     } finally {
       setLoading(false);
@@ -152,7 +153,7 @@ export default function EditInvoicePage() {
         status: formData.status
       };
 
-      console.log('📤 UPDATING INVOICE:', invoiceData);
+
 
       const response = await fetch(`${API_URL}/invoices/update/${invoiceId}`, {
         method: 'PUT',
@@ -165,16 +166,15 @@ export default function EditInvoicePage() {
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Invoice updated successfully!');
-        alert('✅ Invoice updated successfully!');
+        alert('Invoice updated successfully!');
         navigate('/invoices');
       } else {
-        console.error('❌ Error:', data.message);
+
         setError('Error updating invoice: ' + data.message);
       }
 
     } catch (error) {
-      console.error('❌ Error submitting invoice:', error);
+
       setError('Error: ' + error.message);
     } finally {
       setSaving(false);

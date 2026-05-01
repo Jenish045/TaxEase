@@ -16,134 +16,70 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch invoices from API
   const fetchInvoices = async (userId) => {
     try {
-      console.log('🔍 FETCHING INVOICES FOR DASHBOARD:', userId);
-      
       if (!userId || userId === 'undefined') {
-        console.error('❌ USERID INVALID');
         setLoading(false);
         return;
       }
 
-      const url = `${API_URL}/invoices/list/${userId}`;
-      console.log('🔗 FETCHING FROM:', url);
-
-      // ⭐ ADD TIMEOUT
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch(url, {
+      const response = await fetch(`${API_URL}/invoices/list/${userId}`, {
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
-
-      console.log('✅ RESPONSE STATUS:', response.status);
-      console.log('✅ RESPONSE TYPE:', response.headers.get('content-type'));
-
       const data = await response.json();
-
-      console.log('✅ RAW API RESPONSE:', data);
 
       if (data.success && data.data && Array.isArray(data.data)) {
         const recentInvoices = data.data.slice(0, 5);
-        
-        console.log('📋 RECENT INVOICES:', recentInvoices);
-        
         setInvoices(recentInvoices);
 
         let totalAmount = 0;
         data.data.forEach((invoice) => {
-          console.log('🔎 INVOICE DETAIL:', {
-            invoiceNumber: invoice.invoiceNumber,
-            clientName: invoice.clientName,
-            grandTotal: invoice.grandTotal,
-            status: invoice.status
-          });
-          
-          const amount = parseFloat(invoice.grandTotal) || 0;
-          totalAmount += amount;
-        });
-
-        const totalInvoices = data.data.length;
-
-        console.log('📊 FINAL CALCULATION:', {
-          totalInvoices,
-          totalAmount: totalAmount.toFixed(2),
-          invoiceCount: data.data.length
+          totalAmount += parseFloat(invoice.grandTotal) || 0;
         });
 
         setStats({
-          totalInvoices,
+          totalInvoices: data.data.length,
           totalAmount: totalAmount.toFixed(2),
           taxFiled: 0,
           status: 'Active'
         });
-
-        console.log('✅ STATS UPDATED SUCCESSFULLY');
-
       } else {
-        console.error('❌ API ERROR OR NO DATA:', data);
-        setStats({
-          totalInvoices: 0,
-          totalAmount: '0',
-          taxFiled: 0,
-          status: 'Active'
-        });
+        setStats({ totalInvoices: 0, totalAmount: '0', taxFiled: 0, status: 'Active' });
       }
     } catch (error) {
-      console.error('❌ Error fetching invoices:', error);
-      
-      // If timeout or network error, use cached data
-      if (error.name === 'AbortError') {
-        console.warn('⚠️ API REQUEST TIMEOUT - Using cached data');
-      }
-      
-      setStats({
-        totalInvoices: 0,
-        totalAmount: '0',
-        taxFiled: 0,
-        status: 'Active'
-      });
+      setStats({ totalInvoices: 0, totalAmount: '0', taxFiled: 0, status: 'Active' });
     } finally {
       setLoading(false);
     }
   };
 
-  // Load user and fetch invoices - RUNS ONLY ONCE
   useEffect(() => {
     const userData = localStorage.getItem('user');
-    console.log('📦 USER DATA FROM STORAGE:', userData);
-
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log('👤 PARSED USER:', parsedUser);
         setUser(parsedUser);
-
         const userId = parsedUser._id || parsedUser.id;
-        console.log('🆔 USER ID:', userId);
-
         if (userId) {
           fetchInvoices(userId);
         } else {
-          console.error('❌ NO USER ID FOUND');
           setLoading(false);
         }
       } catch (error) {
-        console.error('❌ Error parsing user:', error);
         setLoading(false);
       }
     } else {
-      console.error('❌ NO USER DATA IN STORAGE');
       setLoading(false);
     }
-  }, []); // ⭐ EMPTY DEPENDENCY ARRAY - RUNS ONLY ONCE ON MOUNT
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = () => {
-    console.log('🚪 Logging out...');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -156,7 +92,6 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-page">
-      {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
           <div className="logo" onClick={() => navigate('/')}>
@@ -178,14 +113,13 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="dashboard-content">
         <section className="welcome-section">
           <h1>Welcome Back, {user?.firstName}! 👋</h1>
           <p>Manage your invoices and taxes efficiently</p>
         </section>
 
-        {/* Stats Cards */}
+        {/* Stats */}
         <section className="stats-section">
           <div className="stat-card">
             <div className="stat-icon">📄</div>
@@ -194,7 +128,6 @@ export default function DashboardPage() {
               <p className="stat-value">{stats.totalInvoices}</p>
             </div>
           </div>
-
           <div className="stat-card">
             <div className="stat-icon">💰</div>
             <div className="stat-info">
@@ -202,7 +135,6 @@ export default function DashboardPage() {
               <p className="stat-value">₹{stats.totalAmount}</p>
             </div>
           </div>
-
           <div className="stat-card">
             <div className="stat-icon">📊</div>
             <div className="stat-info">
@@ -210,7 +142,6 @@ export default function DashboardPage() {
               <p className="stat-value">{stats.taxFiled}</p>
             </div>
           </div>
-
           <div className="stat-card">
             <div className="stat-icon">✅</div>
             <div className="stat-info">
@@ -224,28 +155,16 @@ export default function DashboardPage() {
         <section className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="action-buttons">
-            <button 
-              className="action-btn primary"
-              onClick={() => navigate('/create-invoice')}
-            >
+            <button className="action-btn primary" onClick={() => navigate('/create-invoice')}>
               ➕ Create Invoice
             </button>
-            <button 
-              className="action-btn"
-              onClick={() => navigate('/invoices')}
-            >
+            <button className="action-btn" onClick={() => navigate('/invoices')}>
               📁 View Invoices
             </button>
-            <button 
-              className="action-btn"
-              onClick={() => navigate('/reports')}
-            >
+            <button className="action-btn" onClick={() => navigate('/reports')}>
               📊 Generate Report
             </button>
-            <button 
-              className="action-btn"
-              onClick={() => navigate('/settings')}
-            >
+            <button className="action-btn" onClick={() => navigate('/settings')}>
               ⚙️ Settings
             </button>
           </div>
@@ -286,14 +205,13 @@ export default function DashboardPage() {
           ) : (
             <div className="invoice-list">
               <div className="empty-state">
-                <p>No invoices yet. Create your first invoice to get started! 📝</p>
+                <p>No invoices yet. Create your first invoice to get started!</p>
               </div>
             </div>
           )}
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="dashboard-footer">
         <p>&copy; 2026 TaxEase. All rights reserved.</p>
       </footer>

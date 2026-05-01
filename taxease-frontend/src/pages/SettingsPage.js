@@ -26,8 +26,6 @@ export default function SettingsPage() {
     confirmPassword: ''
   });
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -44,6 +42,7 @@ export default function SettingsPage() {
         businessType: parsedUser.businessType || 'individual'
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = () => {
@@ -55,18 +54,12 @@ export default function SettingsPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setPasswordData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleUpdateProfile = async (e) => {
@@ -75,14 +68,11 @@ export default function SettingsPage() {
     setMessage('');
 
     try {
-      console.log('📝 Updating profile...');
-      // For now, just update localStorage (backend integration needed)
       localStorage.setItem('user', JSON.stringify({ ...user, ...formData }));
       setMessage('✅ Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('❌ Error updating profile');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -100,18 +90,11 @@ export default function SettingsPage() {
     }
 
     try {
-      console.log('🔐 Changing password...');
-      // For now, just show success message (backend integration needed)
       setMessage('✅ Password changed successfully!');
-      setPasswordData({
-        oldPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
+      setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('❌ Error changing password');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -119,21 +102,18 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
           <div className="logo" onClick={() => navigate('/')}>
             <span className="logo-icon">💼</span>
             <span className="logo-text">TaxEase</span>
           </div>
-
           <nav className="nav-menu">
             <button className="nav-item" onClick={() => navigate('/dashboard')}>Dashboard</button>
             <button className="nav-item" onClick={() => navigate('/invoices')}>Invoices</button>
             <button className="nav-item" onClick={() => navigate('/reports')}>Reports</button>
             <button className="nav-item active">Settings</button>
           </nav>
-
           <div className="user-section">
             <span className="user-name">👤 {user?.firstName} {user?.lastName}</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
@@ -141,7 +121,6 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="settings-content">
         <div className="page-header">
           <h1>Settings</h1>
@@ -157,35 +136,23 @@ export default function SettingsPage() {
         <div className="settings-container">
           {/* Tabs */}
           <div className="settings-tabs">
-            <button 
-              className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveTab('profile')}
-            >
+            <button className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
               👤 Profile
             </button>
-            <button 
-              className={`tab-btn ${activeTab === 'business' ? 'active' : ''}`}
-              onClick={() => setActiveTab('business')}
-            >
+            <button className={`tab-btn ${activeTab === 'business' ? 'active' : ''}`} onClick={() => setActiveTab('business')}>
               🏢 Business
             </button>
-            <button 
-              className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`}
-              onClick={() => setActiveTab('password')}
-            >
+            <button className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`} onClick={() => setActiveTab('password')}>
               🔐 Password
             </button>
-            <button 
-              className={`tab-btn ${activeTab === 'preferences' ? 'active' : ''}`}
-              onClick={() => setActiveTab('preferences')}
-            >
+            <button className={`tab-btn ${activeTab === 'preferences' ? 'active' : ''}`} onClick={() => setActiveTab('preferences')}>
               ⚙️ Preferences
             </button>
           </div>
 
           {/* Tab Content */}
           <div className="settings-content-area">
-            
+
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <section className="settings-section">
@@ -194,58 +161,26 @@ export default function SettingsPage() {
                   <div className="form-row">
                     <div className="form-group">
                       <label>First Name *</label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        required
-                      />
+                      <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
                     </div>
-
                     <div className="form-group">
                       <label>Last Name *</label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required
-                      />
+                      <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
                     </div>
                   </div>
-
                   <div className="form-row">
                     <div className="form-group">
                       <label>Email *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        disabled
-                      />
+                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} disabled />
                     </div>
-
                     <div className="form-group">
                       <label>Phone</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="10 digit phone number"
-                      />
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="10 digit phone number" />
                     </div>
                   </div>
-
                   <div className="form-actions">
-                    <button 
-                      type="submit" 
-                      className="btn-submit"
-                      disabled={loading}
-                    >
-                      {loading ? 'Updating...' : '💾 Save Changes'}
+                    <button type="submit" className="btn-submit" disabled={loading}>
+                      {loading ? 'Updating...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>
@@ -260,21 +195,11 @@ export default function SettingsPage() {
                   <div className="form-row">
                     <div className="form-group">
                       <label>Business Name</label>
-                      <input
-                        type="text"
-                        name="businessName"
-                        value={formData.businessName}
-                        onChange={handleInputChange}
-                      />
+                      <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} />
                     </div>
-
                     <div className="form-group">
                       <label>Business Type</label>
-                      <select 
-                        name="businessType"
-                        value={formData.businessType}
-                        onChange={handleInputChange}
-                      >
+                      <select name="businessType" value={formData.businessType} onChange={handleInputChange}>
                         <option value="individual">Individual</option>
                         <option value="partnership">Partnership</option>
                         <option value="llp">LLP</option>
@@ -283,38 +208,19 @@ export default function SettingsPage() {
                       </select>
                     </div>
                   </div>
-
                   <div className="form-row">
                     <div className="form-group">
                       <label>GST Number</label>
-                      <input
-                        type="text"
-                        name="gstNumber"
-                        value={formData.gstNumber}
-                        onChange={handleInputChange}
-                        placeholder="GSTIN format"
-                      />
+                      <input type="text" name="gstNumber" value={formData.gstNumber} onChange={handleInputChange} placeholder="GSTIN format" />
                     </div>
-
                     <div className="form-group">
                       <label>PAN Number</label>
-                      <input
-                        type="text"
-                        name="panNumber"
-                        value={formData.panNumber}
-                        onChange={handleInputChange}
-                        placeholder="PAN format"
-                      />
+                      <input type="text" name="panNumber" value={formData.panNumber} onChange={handleInputChange} placeholder="PAN format" />
                     </div>
                   </div>
-
                   <div className="form-actions">
-                    <button 
-                      type="submit" 
-                      className="btn-submit"
-                      disabled={loading}
-                    >
-                      {loading ? 'Updating...' : '💾 Save Changes'}
+                    <button type="submit" className="btn-submit" disabled={loading}>
+                      {loading ? 'Updating...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>
@@ -328,44 +234,19 @@ export default function SettingsPage() {
                 <form onSubmit={handleChangePassword}>
                   <div className="form-group">
                     <label>Current Password *</label>
-                    <input
-                      type="password"
-                      name="oldPassword"
-                      value={passwordData.oldPassword}
-                      onChange={handlePasswordChange}
-                      required
-                    />
+                    <input type="password" name="oldPassword" value={passwordData.oldPassword} onChange={handlePasswordChange} required />
                   </div>
-
                   <div className="form-group">
                     <label>New Password *</label>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      value={passwordData.newPassword}
-                      onChange={handlePasswordChange}
-                      required
-                    />
+                    <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} required />
                   </div>
-
                   <div className="form-group">
                     <label>Confirm Password *</label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={passwordData.confirmPassword}
-                      onChange={handlePasswordChange}
-                      required
-                    />
+                    <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} required />
                   </div>
-
                   <div className="form-actions">
-                    <button 
-                      type="submit" 
-                      className="btn-submit"
-                      disabled={loading}
-                    >
-                      {loading ? 'Updating...' : '🔐 Change Password'}
+                    <button type="submit" className="btn-submit" disabled={loading}>
+                      {loading ? 'Updating...' : 'Change Password'}
                     </button>
                   </div>
                 </form>
@@ -387,7 +268,6 @@ export default function SettingsPage() {
                       <span className="slider"></span>
                     </label>
                   </div>
-
                   <div className="preference-item">
                     <div className="preference-info">
                       <h3>Invoice Reminders</h3>
@@ -398,7 +278,6 @@ export default function SettingsPage() {
                       <span className="slider"></span>
                     </label>
                   </div>
-
                   <div className="preference-item">
                     <div className="preference-info">
                       <h3>Dark Mode</h3>
@@ -416,7 +295,6 @@ export default function SettingsPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="dashboard-footer">
         <p>&copy; 2026 TaxEase. All rights reserved.</p>
       </footer>

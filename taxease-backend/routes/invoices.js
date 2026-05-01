@@ -20,7 +20,7 @@ router.post('/create', async (req, res) => {
       notes
     } = req.body;
 
-    console.log('📝 CREATE INVOICE REQUEST:', invoiceNumber);
+    console.log('[Invoice] Create request:', invoiceNumber);
 
     // Validation
     if (!invoiceNumber || !clientName || !clientEmail || !items || items.length === 0) {
@@ -66,7 +66,7 @@ router.post('/create', async (req, res) => {
     newInvoice.calculateTotals();
 
     await newInvoice.save();
-    console.log('✅ Invoice created:', invoiceNumber);
+    console.log('[Invoice] Created:', invoiceNumber);
 
     res.status(201).json({
       success: true,
@@ -75,7 +75,7 @@ router.post('/create', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ CREATE INVOICE ERROR:', error);
+    console.error('[Invoice] Create error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error creating invoice'
@@ -88,7 +88,7 @@ router.get('/list/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
-    console.log('🔍 GET INVOICES FOR USER:', userId);
+    console.log('[Invoice] Get invoices for user:', userId);
 
     if (!userId || userId === 'undefined') {
       return res.status(400).json({
@@ -102,7 +102,7 @@ router.get('/list/:userId', async (req, res) => {
       .lean() // Fast read-only query
       .sort({ invoiceDate: -1 });
 
-    console.log(`✅ Found ${invoices.length} invoices`);
+    console.log(`[Invoice] Found ${invoices.length} invoices`);
 
     res.json({
       success: true,
@@ -111,7 +111,7 @@ router.get('/list/:userId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ GET INVOICES ERROR:', error);
+    console.error('[Invoice] Get invoices error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error fetching invoices'
@@ -124,7 +124,7 @@ router.get('/:invoiceId', async (req, res) => {
   try {
     const { invoiceId } = req.params;
 
-    console.log('🔍 GET INVOICE:', invoiceId);
+    console.log('[Invoice] Get single invoice:', invoiceId);
 
     const invoice = await Invoice.findById(invoiceId);
 
@@ -135,7 +135,7 @@ router.get('/:invoiceId', async (req, res) => {
       });
     }
 
-    console.log('✅ Invoice found:', invoiceId);
+    console.log('[Invoice] Found invoice:', invoiceId);
 
     res.json({
       success: true,
@@ -143,7 +143,7 @@ router.get('/:invoiceId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ GET INVOICE ERROR:', error);
+    console.error('[Invoice] Get single invoice error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error fetching invoice'
@@ -157,7 +157,7 @@ router.put('/update/:invoiceId', async (req, res) => {
     const { invoiceId } = req.params;
     const updates = req.body;
 
-    console.log('📝 UPDATE INVOICE:', invoiceId);
+    console.log('[Invoice] Update request:', invoiceId);
 
     const invoice = await Invoice.findByIdAndUpdate(invoiceId, updates, { new: true });
 
@@ -168,7 +168,7 @@ router.put('/update/:invoiceId', async (req, res) => {
       });
     }
 
-    console.log('✅ Invoice updated:', invoiceId);
+    console.log('[Invoice] Updated:', invoiceId);
 
     res.json({
       success: true,
@@ -177,7 +177,7 @@ router.put('/update/:invoiceId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ UPDATE INVOICE ERROR:', error);
+    console.error('[Invoice] Update error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error updating invoice'
@@ -190,7 +190,7 @@ router.delete('/delete/:invoiceId', async (req, res) => {
   try {
     const { invoiceId } = req.params;
 
-    console.log('🗑️ DELETE INVOICE:', invoiceId);
+    console.log('[Invoice] Delete request:', invoiceId);
 
     const invoice = await Invoice.findByIdAndDelete(invoiceId);
 
@@ -201,7 +201,7 @@ router.delete('/delete/:invoiceId', async (req, res) => {
       });
     }
 
-    console.log('✅ Invoice deleted:', invoiceId);
+    console.log('[Invoice] Deleted:', invoiceId);
 
     res.json({
       success: true,
@@ -209,7 +209,7 @@ router.delete('/delete/:invoiceId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ DELETE INVOICE ERROR:', error);
+    console.error('[Invoice] Delete error:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Error deleting invoice'
